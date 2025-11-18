@@ -16,7 +16,8 @@ return new class extends Migration {
             $table->string('sku', 50)->unique();
             $table->string('name', 30);
             $table->decimal('sell_price', 15, 2);
-            $table->decimal('stock', 15, 3)->default(0);
+            // BARIS YANG DIUBAH: Dari decimal(15, 3) menjadi integer
+            $table->integer('stock')->default(0);
             $table->timestamps();
         });
     }

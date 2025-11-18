@@ -32,8 +32,4 @@
             </form>
         </div>
     </div>
-
-    <div class="text-center mt-4 text-muted small">
-        &copy; 2025 Toko Ajo Asli Store
-    </div>
 @endsection

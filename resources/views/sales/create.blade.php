@@ -47,7 +47,8 @@
                                         <option value="" data-price="0">-- Pilih Produk --</option>
                                         @foreach ($products as $prod)
                                             <option value="{{ $prod->id }}" data-price="{{ $prod->sell_price }}">
-                                                {{ $prod->sku }} - {{ $prod->name }} (Stok: {{ $prod->stock }})
+                                                {{ $prod->sku }} - {{ $prod->name }} (Stok:
+                                                {{ number_format($prod->stock, 0, ',', '.') }}) {{-- PERBAIKAN STOK --}}
                                             </option>
                                         @endforeach
                                     </select>
@@ -207,7 +208,7 @@
             tableBody.addEventListener('input', function(e) {
                 // Sekarang mendengarkan perubahan Qty dan Price
                 if (e.target.classList.contains('qty-input') || e.target.classList.contains(
-                    'price-input')) {
+                        'price-input')) {
                     calculateTotals();
                 }
             });

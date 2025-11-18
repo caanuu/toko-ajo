@@ -59,7 +59,7 @@
                                 <select name="products[0][product_id]" class="form-select form-select-sm product-select" required>
                                     <option value="" data-stock="0">-- Pilih Produk --</option>
                                     @foreach($products as $prod)
-                                        <option value="{{ $prod->id }}" data-stock="{{ $prod->stock }}">
+                                        <option value="{{ $prod->id }}" data-stock="{{ number_format($prod->stock, 0, '', '') }}"> {{-- PERBAIKAN STOK --}}
                                             {{ $prod->name }} (SKU: {{ $prod->sku }})
                                         </option>
                                     @endforeach
@@ -97,10 +97,11 @@
         const tableBody = document.querySelector('#adj-table tbody');
         const addBtn = document.getElementById('add-row');
 
+        // PERBAIKAN: Gunakan number_format(..., 0, '', '') di PHP untuk memastikan stock tampil bulat di JS.
         const productOptions = `
             <option value="" data-stock="0">-- Pilih Produk --</option>
             @foreach($products as $prod)
-                <option value="{{ $prod->id }}" data-stock="{{ $prod->stock }}">
+                <option value="{{ $prod->id }}" data-stock="{{ number_format($prod->stock, 0, '', '') }}">
                     {{ $prod->name }} (SKU: {{ $prod->sku }})
                 </option>
             @endforeach

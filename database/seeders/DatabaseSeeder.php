@@ -10,12 +10,38 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Sesuai Skenario Pengujian Tabel 4.1 No 1 (Login dengan data valid)
+        // Data Default (Role Owner)
         User::create([
-            'name' => 'Administrator',
-            'email' => 'admin@tokoajo.com',
-            'password' => Hash::make('password123'), // Password default
-            'role' => 'owner', // Sesuai struktur organisasi
+            'name' => 'Owner Utama Toko Ajo',
+            'email' => 'owner@tokoajo.com',
+            'password' => Hash::make('password123'),
+            'role' => 'owner',
         ]);
+
+        // TAMBAHAN BARU (Admin 1, Admin 2, Kasir)
+        $users = [
+            [
+                'name' => 'Admin 1 (Gudang)',
+                'email' => 'gudang@tokoajo.com',
+                'password' => Hash::make('password123'),
+                'role' => 'gudang',
+            ],
+            [
+                'name' => 'Admin 2 (Pemasaran)',
+                'email' => 'pemasaran@tokoajo.com',
+                'password' => Hash::make('password123'),
+                'role' => 'pemasaran',
+            ],
+            [
+                'name' => 'Karyawan Kasir',
+                'email' => 'kasir@tokoajo.com',
+                'password' => Hash::make('password123'),
+                'role' => 'karyawan',
+            ],
+        ];
+
+        foreach ($users as $user) {
+            User::create($user);
+        }
     }
 }
