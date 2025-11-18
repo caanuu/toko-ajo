@@ -8,7 +8,8 @@ use App\Http\Controllers\SaleController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\StockAdjustmentController;
 use App\Http\Controllers\ReportController;
-use App\Http\Controllers\AuthController; // Import AuthController
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\SettingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,7 +19,7 @@ use App\Http\Controllers\AuthController; // Import AuthController
 
 // --- AUTHENTICATION ---
 Route::get('/', function () {
-    return redirect()->route('login'); // Redirect awal ke login
+    return redirect()->route('login');
 });
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -28,27 +29,27 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // --- PROTECTED ROUTES (Harus Login) ---
 Route::middleware('auth')->group(function () {
 
+    // Dashboard
     Route::get('/dashboard', function () {
         return view('dashboard.index');
     })->name('dashboard');
 
-    // 1. Data Master
-    Route::resource('categories', CategoryController::class);
-    Route::resource('products', ProductController::class);
-    Route::resource('suppliers', SupplierController::class);
+    // Data Master
+    Route::resource('categories', CategoryController::class)->except(['show']);
+    Route::resource('products', ProductController::class)->except(['show']);
+    Route::resource('suppliers', SupplierController::class)->except(['show']);
 
-    // 2. Transaksi
-    Route::resource('purchases', PurchaseController::class);
-    Route::resource('sales', SaleController::class);
+    // Transaksi & Laporan
+    Route::resource('purchases', PurchaseController::class)->except(['edit', 'update', 'destroy']); // Index untuk Laporan
+    Route::resource('sales', SaleController::class)->except(['edit', 'update', 'destroy']); // Index untuk Laporan
 
-    // 3. Inventory
-    Route::resource('adjustments', StockAdjustmentController::class);
+    // Inventory
+    Route::resource('adjustments', StockAdjustmentController::class)->except(['edit', 'update', 'destroy']);
     Route::get('/stock-card', [ReportController::class, 'stockCard'])->name('stock-card.index');
     Route::get('/min-stock', [ReportController::class, 'minStock'])->name('min-stock.index');
 
-    // 4. Settings
-    Route::get('/settings', function () {
-        return view('settings.index');
-    })->name('settings.index');
+    // Settings
+    Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+    Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
 
 });

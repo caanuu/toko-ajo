@@ -17,7 +17,7 @@
                 <tr>
                     <th width="5%">No</th>
                     <th>Nama Supplier</th>
-                    <th>Kontak (HP/Telp)</th>
+                    <th>Telp</th>
                     <th>Alamat</th>
                     <th width="15%">Aksi</th>
                 </tr>

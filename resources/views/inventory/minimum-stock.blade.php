@@ -1,63 +1,100 @@
 @extends('layouts.app')
-@section('title', 'Stok Minimum')
-@section('page-title', 'Peringatan Stok Menipis')
+@section('title', 'Laporan Stok Minimum')
+@section('page-title', 'Laporan Stok Minimum')
 
 @section('content')
-<div class="alert alert-danger d-flex align-items-center" role="alert">
-    <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
-    <div>
-        <strong>Perhatian!</strong> Daftar produk di bawah ini memiliki stok kurang dari 5 item. Segera lakukan pembelian ulang (restock).
-    </div>
-</div>
 
-<div class="card shadow-sm">
-    <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 text-danger">Barang Perlu Restock</h5>
-        <a href="{{ route('purchases.create') }}" class="btn btn-primary btn-sm">
-            <i class="fas fa-shopping-cart"></i> Beli Barang Sekarang
-        </a>
+    <div class="alert alert-danger border-0 shadow-sm d-flex align-items-center mb-4" role="alert">
+        <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+            style="width: 40px; height: 40px; min-width: 40px;">
+            <i class="fas fa-exclamation-triangle fs-5"></i>
+        </div>
+        <div>
+            <h6 class="fw-bold mb-0">Peringatan Stok Menipis!</h6>
+            <small>Produk di bawah ini telah mencapai batas minimum stok. Segera lakukan pembelian ulang (restock).</small>
+        </div>
     </div>
-    <div class="card-body">
-        <table class="table table-bordered table-hover">
-            <thead class="table-light">
-                <tr>
-                    <th>No</th>
-                    <th>SKU</th>
-                    <th>Nama Produk</th>
-                    <th>Kategori</th>
-                    <th>Supplier (Terakhir)</th>
-                    <th class="text-center">Sisa Stok</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($lowStockProducts as $index => $prod)
-                <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td>{{ $prod->sku }}</td>
-                    <td><strong>{{ $prod->name }}</strong></td>
-                    <td>{{ $prod->category->name }}</td>
-                    <td>
-                        {{-- Mencari supplier terakhir dari riwayat pembelian --}}
-                        @php
-                            $lastPurchase = \App\Models\PurchaseDetail::where('product_id', $prod->id)
-                                            ->latest()->first();
-                        @endphp
-                        {{ $lastPurchase ? $lastPurchase->purchase->supplier->name : '-' }}
-                    </td>
-                    <td class="text-center">
-                        <span class="badge bg-danger fs-6">{{ $prod->stock }}</span>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="6" class="text-center py-4 text-success">
-                        <i class="fas fa-check-circle fa-3x mb-2"></i><br>
-                        <strong>Aman!</strong> Tidak ada produk yang stoknya menipis.
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
+            <h6 class="m-0 fw-bold text-dark">Daftar Barang Perlu Restock</h6>
+            <div>
+                <a href="{{ route('purchases.create') }}" class="btn btn-primary btn-sm me-1">
+                    <i class="fas fa-shopping-cart me-1"></i> Restock Sekarang
+                </a>
+                <button onclick="window.print()" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-print me-1"></i> Print
+                </button>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4 py-3" width="5%">No</th>
+                            <th class="py-3">Kode Barang</th>
+                            <th class="py-3">Nama Barang</th>
+                            <th class="py-3">Kategori</th>
+                            <th class="py-3">Supplier Terakhir</th>
+                            <th class="text-center py-3">Stok Saat Ini</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($lowStockProducts as $index => $prod)
+                            <tr>
+                                <td class="ps-4">{{ $index + 1 }}</td>
+                                <td class="fw-bold text-muted">{{ $prod->sku }}</td>
+                                <td class="fw-bold text-dark">{{ $prod->name }}</td>
+                                <td><span class="badge bg-light text-dark border">{{ $prod->category->name }}</span></td>
+                                <td>
+                                    {{-- Logika ambil supplier terakhir --}}
+                                    @php
+                                        $lastSup = \App\Models\PurchaseDetail::where('product_id', $prod->id)
+                                            ->latest()
+                                            ->with('purchase.supplier')
+                                            ->first();
+                                    @endphp
+                                    {{ $lastSup ? $lastSup->purchase->supplier->name : '-' }}
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-danger fs-6 px-3 py-2">{{ $prod->stock }}</span>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="text-success mb-2"><i class="fas fa-check-circle fa-3x"></i></div>
+                                    <h6 class="fw-bold text-muted">Stok Aman!</h6>
+                                    <small class="text-muted">Tidak ada produk yang perlu di-restock saat ini.</small>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-</div>
+
+    <style>
+        @media print {
+
+            .sidebar,
+            .top-navbar,
+            .btn,
+            .alert {
+                display: none !important;
+            }
+
+            .main-content {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .card {
+                border: none !important;
+                shadow: none !important;
+            }
+        }
+    </style>
 @endsection

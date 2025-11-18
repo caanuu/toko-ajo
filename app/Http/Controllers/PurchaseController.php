@@ -14,16 +14,42 @@ class PurchaseController extends Controller
 {
     public function index(Request $request)
     {
-        // Logika Filter Laporan sesuai BAB IV Gambar 4.10
         $query = Purchase::with('supplier');
+        $detailQuery = PurchaseDetail::query();
 
+        // Filter Tanggal
         if ($request->start_date && $request->end_date) {
             $query->whereBetween('date', [$request->start_date, $request->end_date]);
+
+            // Filter untuk detail (Top 10) juga harus ikut tanggal
+            $detailQuery->whereHas('purchase', function ($q) use ($request) {
+                $q->whereBetween('date', [$request->start_date, $request->end_date]);
+            });
         }
 
         $purchases = $query->latest()->get();
 
-        return view('purchases.index', compact('purchases'));
+        // Hitung Ringkasan (Card Atas)
+        $summary = [
+            'count' => $purchases->count(),
+            'subtotal' => $purchases->sum('subtotal'),
+            'discount' => $purchases->sum('discount'),
+            'total' => $purchases->sum('total'),
+        ];
+
+        // Hitung Top 10 Produk Dibeli
+        $topProducts = $detailQuery->select(
+            'product_id',
+            DB::raw('sum(qty) as total_qty'),
+            DB::raw('sum(subtotal) as total_value')
+        )
+            ->groupBy('product_id')
+            ->orderByDesc('total_qty')
+            ->take(10)
+            ->with('product')
+            ->get();
+
+        return view('purchases.index', compact('purchases', 'summary', 'topProducts'));
     }
 
     public function create()
@@ -31,7 +57,6 @@ class PurchaseController extends Controller
         $suppliers = Supplier::all();
         $products = Product::all();
 
-        // Generate Kode Otomatis (PO-TahunBulan-Urutan)
         $lastPurchase = Purchase::latest()->first();
         $nextId = $lastPurchase ? $lastPurchase->id + 1 : 1;
         $generatedCode = 'PO-' . date('ym') . '-' . str_pad($nextId, 4, '0', STR_PAD_LEFT);
@@ -109,6 +134,7 @@ class PurchaseController extends Controller
 
     public function show(Purchase $purchase)
     {
+        $purchase->load('details.product');
         return view('purchases.show', compact('purchase'));
     }
 }

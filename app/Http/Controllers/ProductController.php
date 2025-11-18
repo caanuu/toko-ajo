@@ -26,15 +26,15 @@ class ProductController extends Controller
     {
         $request->validate([
             'category_id' => 'required',
-            'sku'         => 'required|unique:products',
-            'name'        => 'required|max:30',
-            'sell_price'  => 'required|numeric',
-            'stock'       => 'required|numeric'
+            'sku' => 'required|unique:products',
+            'name' => 'required|max:30',
+            'sell_price' => 'required|numeric',
+            'stock' => 'required|numeric'
         ]);
 
         Product::create($request->all());
 
         return redirect()->route('products.index')
-                         ->with('success', 'Produk berhasil ditambahkan');
+            ->with('success', 'Produk berhasil ditambahkan');
     }
 }

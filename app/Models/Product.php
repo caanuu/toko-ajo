@@ -6,7 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    protected $guarded = [];
+    // PERBAIKAN: Gunakan $fillable untuk mengizinkan Mass Assignment
+    protected $fillable = [
+        'category_id',
+        'sku',
+        'name',
+        'sell_price',
+        'stock',
+    ];
 
     // Relasi ke Kategori (Produk milik 1 Kategori)
     public function category()

@@ -6,7 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Purchase extends Model
 {
-    protected $guarded = [];
+    // PERBAIKAN: Gunakan fillable secara eksplisit (seperti Sale)
+    protected $fillable = [
+        'code',
+        'date',
+        'supplier_id',
+        'subtotal',
+        'discount', // Diskon
+        'tax',      // Pajak
+        'total',
+        'notes',
+    ];
+
     protected $dates = ['date']; // Agar format tanggal otomatis
 
     public function supplier()
